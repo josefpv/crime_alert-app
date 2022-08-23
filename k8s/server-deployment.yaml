@@ -18,3 +18,40 @@ spec:
           ports:
             - containerPort: 5000
           ##insert varables of database here
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres
+                  key: username
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: postgres
+                  key: password
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres
+                  key: database
+        - name: cloud-sql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.28.0 # make sure the use the latest version
+          command:
+            - "/cloud_sql_proxy"
+            - "-log_debug_stdout"
+            - "-instances=crime-app-postgres=tcp:5432"
+            - "-credential_file=/secrets/service_account.json"
+          securityContext:
+            runAsNonRoot: true
+          volumeMounts:
+            - name: postgres
+              mountPath: /secrets/
+              readOnly: true
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1"
+      volumes:
+        - name: postgres
+          secret:
+            secretName: postgres

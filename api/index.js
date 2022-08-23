@@ -2,20 +2,19 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const { Pool } = require("pg");
+const keys = require("./keys");
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-/*
 const pgClient = new Pool({
-  user: "josevivas",
-  host: "35.192.27.130",
-  database: "crime_alerts",
-  password: "nfs2008yo",
-  port: 5432,
+  user: keys.pgUser,
+  host: keys.pgHost,
+  database: keys.pgDatabase,
+  password: keys.pgPassword,
+  port: keys.pgPort,
 });
-*/
 
 app.get("/", (req, res) => {
   res.send("Hello World");
@@ -26,7 +25,8 @@ app.get("/crimetypes", async (req, res) => {
     { id: 1, description: "Asalto" },
     { id: 2, description: "Otro" },
   ];
-  //const crimeTypes = await pgClient.query("SELECT * FROM crime_types");
+  const crimeTypes_ = await pgClient.query("SELECT * FROM crime_types");
+  console.log(crimeTypes_);
   res.send(crimeTypes);
 });
 
