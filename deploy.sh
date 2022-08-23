@@ -1,5 +1,5 @@
 docker build -t josefvivas/crime-alert-client:latest -t josefvivas/crime-alert-client:$SHA -f ./client/Dockerfile ./client
-docker build -t josefvivas/crime-alert-server:latest -t josefvivas/crime-alert-server:$SHA -f ./api/Dockerfile ./server
+docker build -t josefvivas/crime-alert-server:latest -t josefvivas/crime-alert-server:$SHA -f ./api/Dockerfile ./api
 
 docker push josefvivas/crime-alert-client:latest
 docker push josefvivas/crime-alert-server:latest
