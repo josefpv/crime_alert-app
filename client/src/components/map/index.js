@@ -154,7 +154,7 @@ export const Map = () => {
                 onChange={handleLocationTextChange}
               />
               <Button onClick={() => handleSearchLocation()}>
-                Ir a ubicación...
+                Ir a la ubicación...
               </Button>
               <Button onClick={() => resetLocation()}>Borrar</Button>
             </Paper>
