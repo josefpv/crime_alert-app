@@ -1,7 +1,7 @@
 module.exports = {
-  pgHost: "localhost",
+  pgHost: process.env.DB_HOST,
   pgUser: process.env.DB_USER,
   pgDatabase: process.env.DB_NAME,
   pgPassword: process.env.DB_PASS,
-  pgPort: 5432,
+  pgPort: process.env.DB_PORT,
 };
