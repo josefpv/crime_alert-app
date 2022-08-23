@@ -21,12 +21,14 @@ app.get("/", (req, res) => {
 });
 
 app.get("/crimetypes", async (req, res) => {
+  /*
   const crimeTypes = [
     { id: 1, description: "Asalto" },
     { id: 2, description: "Otro" },
   ];
-  const crimeTypes_ = await pgClient.query("SELECT * FROM crime_types");
-  console.log(crimeTypes_);
+  */
+  const crimeTypes = await pgClient.query("SELECT * FROM crime_types");
+  console.log(crimeTypes);
   res.send(crimeTypes);
 });
 
