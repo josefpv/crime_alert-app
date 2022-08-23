@@ -6,16 +6,16 @@ env:
     - SHA=$(git rev-parse HEAD)
     - CLOUDSDK_CORE_DISABLE_PROMPTS=1
 before_install:
-  - openssl aes-256-cbc -K $encrypted_8685b91d5668_key -iv $encrypted_8685b91d5668_iv -in account-service.json.enc -out account-service.json -d
+  - openssl aes-256-cbc -K $encrypted_248d61edfafe_key -iv $encrypted_248d61edfafe_iv -in service_account.json.enc -out service_account.json -d
   - curl https://sdk.cloud.google.com | bash > /dev/null;
   - source $HOME/google-cloud-sdk/path.bash.inc
   - gcloud components update kubectl
-  - gcloud auth activate-service-account --key-file account-service.json
+  - gcloud auth activate-service-account --key-file service_account.json
   - gcloud config set project crime-alerts-356219
   - gcloud config set compute/zone us-central1-c
   - gcloud container clusters get-credentials crime-alert-cluster
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker build -t josefvivas/react-test -f Dockerfile.dev ./client
+  - docker build -t josefvivas/react-test -f ./client/Dockerfile.dev ./client
 
 script:
   - docker run -e CI=true josefvivas/react-test npm test
