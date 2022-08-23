@@ -32,7 +32,7 @@ spec:
             - name: DB_NAME
               value: crime_alerts
             - name: DB_HOST
-              value: localhost
+              value: "localhost"
             - name: DB_PORT
               value: "5432"
         - name: cloud-sql-proxy
