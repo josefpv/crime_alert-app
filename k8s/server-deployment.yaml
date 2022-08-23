@@ -30,10 +30,11 @@ spec:
                   name: postgres
                   key: password
             - name: DB_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: postgres
-                  key: database
+              value: crime_alerts
+            - name: DB_HOST
+              value: "localhost"
+            - name: DB_PORT
+              value: "5432"
         - name: cloud-sql-proxy
           image: gcr.io/cloudsql-docker/gce-proxy:1.28.0 # make sure the use the latest version
           command:
