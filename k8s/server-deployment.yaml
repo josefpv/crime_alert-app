@@ -53,7 +53,7 @@ spec:
               readOnly: true
           resources:
             requests:
-              memory: "2Gi"
+              memory: "1Gi"
               cpu: "1"
       volumes:
         - name: postgres
