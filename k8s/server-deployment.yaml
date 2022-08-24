@@ -43,7 +43,7 @@ spec:
           command:
             - "/cloud_sql_proxy"
             - "-log_debug_stdout"
-            - "-instances=crime-app-postgres=tcp:5432"
+            - "-instances=crime-alerts-356219:us-central1:crime-app-postgres=tcp:5432"
             - "-credential_file=/secrets/service_account.json"
           securityContext:
             runAsNonRoot: true
@@ -53,7 +53,8 @@ spec:
               readOnly: true
           resources:
             requests:
-              memory: "1Gi"
+              memory: "2Gi"
+              cpu: "1"
       volumes:
         - name: postgres
           secret:
