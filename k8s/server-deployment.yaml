@@ -22,15 +22,18 @@ spec:
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
-                  name: postgres
+                  name: postgressecret
                   key: username
             - name: DB_PASS
               valueFrom:
                 secretKeyRef:
-                  name: postgres
+                  name: postgressecret
                   key: password
             - name: DB_NAME
-              value: crime_alerts
+              valueFrom:
+                secretKeyRef:
+                  name: postgressecret
+                  key: database
             - name: DB_HOST
               value: "localhost"
             - name: DB_PORT
