@@ -4,7 +4,8 @@ import {
   useJsApiLoader,
   GoogleMap,
   Marker,
-  Autocomplete,
+  MarkerClusterer,
+  InfoWindow,
 } from "@react-google-maps/api";
 import {
   Box,
@@ -16,6 +17,8 @@ import {
   TextField,
   Button,
   MenuItem,
+  Card,
+  CardContent,
 } from "@mui/material";
 
 import {
@@ -26,7 +29,12 @@ import {
   setCrimeType,
   setSelectedCrime,
   fetchCrimeTypesAsyn,
+  fetchCurrentDayEvents,
+  generateAlert,
+  toogleInfoWindow,
+  setInfoWindowData,
 } from "./../../store/features/mapState";
+import clusterImg from "./../../images/theft.png";
 
 export const Map = () => {
   const [map, setMap] = useState(null);
@@ -36,6 +44,11 @@ export const Map = () => {
   const crimeDetails = useSelector((state) => state.mapState.crimeDetails);
   const crimeType = useSelector((state) => state.mapState.crimeType);
   const crimeTypes = useSelector((state) => state.mapState.crimeTypes);
+  const cuerrentDayEventsLocation = useSelector(
+    (state) => state.mapState.cuerrentDayEventsLocation
+  );
+  const showInfoWindow = useSelector((state) => state.mapState.showInfoWindow);
+  const infoWindowData = useSelector((state) => state.mapState.infoWindowData);
 
   const dispatch = useDispatch();
 
@@ -68,7 +81,7 @@ export const Map = () => {
     dispatch(setMarker(null));
     dispatch(setInputLocation(""));
     dispatch(setCrimeDetails(""));
-    dispatch(setCrimeType(1));
+    dispatch(setSelectedCrime(1));
   };
 
   const handleLocationNotFound = () => {
@@ -81,16 +94,44 @@ export const Map = () => {
     dispatch(setInputLocation(e.target.value));
   };
 
+  const handleSaveAlert = () => {
+    dispatch(generateAlert());
+    resetLocation();
+    dispatch(fetchCurrentDayEvents());
+  };
+
+  const createKey = (location) => {
+    return location.lat + location.lng;
+  };
+
+  const handleInfoWindow = (infoEvent) => {
+    dispatch(setInfoWindowData(infoEvent));
+    dispatch(toogleInfoWindow());
+  };
+
+  const handleCloseInfoWindow = () => {
+    dispatch(setInfoWindowData({}));
+    dispatch(toogleInfoWindow());
+  };
+
   useEffect(() => {
     dispatch(fetchCrimeTypesAsyn());
+    dispatch(fetchCurrentDayEvents());
+    const intervalo = setInterval(() => {
+      dispatch(fetchCurrentDayEvents());
+    }, 5000);
+
+    return () => clearInterval(intervalo);
   }, []);
 
   useEffect(() => {
     setMarker(center);
+    /*
     navigator.geolocation.getCurrentPosition((position) => {
       console.log(position.coords.latitude);
       console.log(position.coords.longitude);
     });
+    */
   }, [center]);
 
   const { isLoaded } = useJsApiLoader({
@@ -119,10 +160,9 @@ export const Map = () => {
             clickableIcons={false}
             zoom={15}
             options={{
-              zoomControl: false,
+              zoomControl: true,
               streetViewControl: false,
               maxZoom: 15,
-              minZoom: 15,
             }}
             mapContainerStyle={{
               width: "100%",
@@ -134,12 +174,51 @@ export const Map = () => {
             onLoad={(map) => setMap(map)}
           >
             {marker != null ? <Marker position={marker} /> : null}
+            {cuerrentDayEventsLocation &&
+            cuerrentDayEventsLocation.length > 0 ? (
+              <MarkerClusterer onLoad={() => console.log("cluster loaded")}>
+                {(clusterer) =>
+                  cuerrentDayEventsLocation.map((infoEvent) => (
+                    <Marker
+                      key={createKey(infoEvent.coors)}
+                      position={infoEvent.coors}
+                      clusterer={clusterer}
+                      icon={clusterImg}
+                      onClick={() => handleInfoWindow(infoEvent)}
+                    />
+                  ))
+                }
+              </MarkerClusterer>
+            ) : null}
+            {showInfoWindow ? (
+              <InfoWindow
+                onLoad={() => console.log("cluster loaded")}
+                onCloseClick={() => handleCloseInfoWindow()}
+                position={infoWindowData.coors}
+              >
+                <Box sx={{ minWidth: 275 }}>
+                  <Card variant="outlined">
+                    <CardContent>
+                      <Typography variant="h5" component="div">
+                        {infoWindowData.description}
+                      </Typography>
+                      <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                        {infoWindowData.event_date}
+                      </Typography>
+                      <Typography variant="body2">
+                        {infoWindowData.details}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Box>
+              </InfoWindow>
+            ) : null}
           </GoogleMap>
         </Box>
       </Grid>
       <Container sx={{ zIndex: "modal", marginTop: 4 }}>
         <Stack direction="row" justifyContent="center">
-          <Grid item xs={4}>
+          <Grid item xs={12} md={4}>
             <Paper
               sx={{ backgroundColor: "white", borderRadius: 2, padding: 2 }}
               elevation={8}
@@ -156,17 +235,25 @@ export const Map = () => {
               <Button onClick={() => handleSearchLocation()}>
                 Ir a la ubicación...
               </Button>
-              <Button onClick={() => resetLocation()}>Borrar</Button>
+              <Button onClick={() => resetLocation()}>Cancelar</Button>
+              <Typography variant="overline" display="block" gutterBottom>
+                Mostrando eventos del dia
+              </Typography>
             </Paper>
           </Grid>
         </Stack>
       </Container>
       {marker ? (
-        <Container
-          sx={{ zIndex: "modal", position: "absolute", bottom: 0, right: 0 }}
-        >
-          <Stack direction="row" justifyContent="right">
-            <Grid item xs={8}>
+        <Container>
+          <Stack
+            sx={{
+              zIndex: "modal",
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+            }}
+          >
+            <Grid item xs={12} md={12}>
               <Paper sx={{ padding: 8 }}>
                 <Typography variant="h6">Detalles del evento:</Typography>
 
@@ -198,7 +285,7 @@ export const Map = () => {
                 <Typography variant="overline" display="block">
                   Ubicación: {locationText ? locationText : "No especificado"}
                 </Typography>
-                <Button onClick={() => console.log("Alerta generada")}>
+                <Button onClick={() => handleSaveAlert()}>
                   Generar Alerta
                 </Button>
               </Paper>

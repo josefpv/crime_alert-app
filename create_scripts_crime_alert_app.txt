@@ -1,0 +1,35 @@
+-- Table: public.crime_events
+
+-- DROP TABLE public.crime_events;
+
+CREATE TABLE public.crime_events
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    event_date timestamp without time zone NOT NULL,
+    coors json NOT NULL,
+    details character varying(800) COLLATE pg_catalog."default",
+    crime_type integer NOT NULL,
+    CONSTRAINT crime_events_pkey PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.crime_events
+    OWNER to postgres;
+
+
+-- Table: public.crime_types
+
+-- DROP TABLE public.crime_types;
+
+CREATE TABLE public.crime_types
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    description character varying(450) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT crime_types_pkey PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.crime_types
+    OWNER to postgres;
